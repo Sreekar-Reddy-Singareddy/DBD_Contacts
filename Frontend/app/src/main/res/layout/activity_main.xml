@@ -47,7 +47,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/dates_rv"
                 android:layout_width="0dp"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
@@ -70,7 +70,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/phones_rv"
                 android:layout_width="0dp"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
@@ -135,7 +135,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/addresses_rv"
                 android:layout_width="0dp"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
@@ -151,6 +151,26 @@
                 app:layout_constraintBottom_toBottomOf="@+id/address_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/address_tv"
+                app:srcCompat="@drawable/ic_add_circle_black_24dp" />
+
+            <ImageView
+                android:id="@+id/add_phone_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/phone_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/phone_tv"
+                app:srcCompat="@drawable/ic_add_circle_black_24dp" />
+
+            <ImageView
+                android:id="@+id/add_date_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/date_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/date_tv"
                 app:srcCompat="@drawable/ic_add_circle_black_24dp" />
         </android.support.constraint.ConstraintLayout>
 

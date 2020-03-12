@@ -1,51 +1,52 @@
 package singareddy.productionapps.dbd_contacts.models;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 public class Contact {
-    private String fname, mname, lname;
-    private int _id;
 
-    public Contact(String fname, String mname, String lname) {
-        this.fname = fname;
-        this.mname = mname;
-        this.lname = lname;
+    private Name nameData;
+    private List<Address> addressData;
+    private List<Phone> phoneData;
+    private List<Date> dateData;
+
+    public Contact(Name nameData, List<Address> addressData, List<Phone> phoneData, List<Date> dateData) {
+        this.nameData = nameData;
+        this.addressData = addressData;
+        this.phoneData = phoneData;
+        this.dateData = dateData;
     }
 
-    public Contact(String fname, String mname, String lname, int _id) {
-        this.fname = fname;
-        this.mname = mname;
-        this.lname = lname;
-        this._id = _id;
+    public Name getNameData() {
+        return nameData;
     }
 
-    public int get_id() {
-        return _id;
+    public void setNameData(Name nameData) {
+        this.nameData = nameData;
     }
 
-    public void set_id(int _id) {
-        this._id = _id;
+    public List<Address> getAddressData() {
+        return addressData;
     }
 
-    public String getFname() {
-        return fname;
+    public void setAddressData(List<Address> addressData) {
+        this.addressData = addressData;
     }
 
-    public void setFname(String fname) {
-        this.fname = fname;
+    public List<Phone> getPhoneData() {
+        return phoneData;
     }
 
-    public String getMname() {
-        return mname;
+    public void setPhoneData(List<Phone> phoneData) {
+        this.phoneData = phoneData;
     }
 
-    public void setMname(String mname) {
-        this.mname = mname;
+    public List<Date> getDateData() {
+        return dateData;
     }
 
-    public String getLname() {
-        return lname;
-    }
-
-    public void setLname(String lname) {
-        this.lname = lname;
+    public void setDateData(List<Date> dateData) {
+        this.dateData = dateData;
     }
 }

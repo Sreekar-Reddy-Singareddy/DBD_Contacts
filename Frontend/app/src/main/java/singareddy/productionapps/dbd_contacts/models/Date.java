@@ -18,6 +18,10 @@ public class Date {
         this._id = _id;
     }
 
+    public Date() {
+
+    }
+
     public String getDateType() {
         return dateType;
     }

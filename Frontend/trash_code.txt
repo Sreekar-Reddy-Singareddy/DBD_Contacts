@@ -1,0 +1,50 @@
+Gson gsonObject = new Gson();
+        ObjectMapper mapper = new ObjectMapper();
+        JSONObject finalJson = new JSONObject();
+        String jsonString = "";
+
+        String[] addressJson = new String[addressesData.size()];
+        for (int i=0; i<addressesData.size(); i++) {
+            String json = gsonObject.toJson(addressesData.get(i));
+            addressJson[i] = json;
+        }
+        try {
+            finalJson.put("Address", mapper.writeValueAsString(addressJson));
+        } catch (JSONException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        String[] phoneJson = new String[phonesData.size()];
+        for (int i=0; i<phonesData.size(); i++) {
+            String json = gsonObject.toJson(phonesData.get(i));
+            phoneJson[i] = json;
+        }
+        try {
+            finalJson.put("Phone", mapper.writeValueAsString(phoneJson));
+        } catch (JSONException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        String[] dateJson = new String[datesData.size()];
+        for (int i=0; i<datesData.size(); i++){
+            String json = gsonObject.toJson(datesData.get(i));
+            dateJson[i] = json;
+        }
+        try {
+            finalJson.put("Date", mapper.writeValueAsString(dateJson));
+        } catch (JSONException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        Name nameObject = new Name(fname.getText().toString(), mname.getText().toString(), lname.getText().toString());
+        try {
+            finalJson.put("Name", mapper.writeValueAsString(nameObject));
+        } catch (JSONException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            System.out.println("JSON: ******************************** \n"+gsonObject.toJson(finalJson));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }

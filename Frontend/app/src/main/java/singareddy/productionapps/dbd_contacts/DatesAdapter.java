@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import singareddy.productionapps.dbd_contacts.models.Date;
@@ -60,6 +61,8 @@ public class DatesAdapter extends RecyclerView.Adapter<DatesAdapter.DatesVH> {
     public void onBindViewHolder(@NonNull DatesVH datesVH, int i) {
         Date dateObject = dates.get(i);
         datesVH.type.setText(dateObject.getDateType());
-        datesVH.date.setText(dateObject.getDate().toString());
+        SimpleDateFormat format = new SimpleDateFormat();
+        format.applyPattern("MM-dd-YYYY");
+        datesVH.date.setText(format.format(dateObject.getDate()));
     }
 }

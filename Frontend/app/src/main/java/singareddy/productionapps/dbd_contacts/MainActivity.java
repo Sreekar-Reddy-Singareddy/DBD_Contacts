@@ -1,5 +1,6 @@
 package singareddy.productionapps.dbd_contacts;
 
+import android.annotation.SuppressLint;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,15 +9,31 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 import singareddy.productionapps.dbd_contacts.models.Address;
+import singareddy.productionapps.dbd_contacts.models.Contact;
+import singareddy.productionapps.dbd_contacts.models.Name;
 import singareddy.productionapps.dbd_contacts.models.Date;
 import singareddy.productionapps.dbd_contacts.models.Phone;
 
@@ -25,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
     private EditText fname, mname, lname;
     private RecyclerView addresses, phones, dates;
     private Button save;
-    private ImageView addAddress;
+    private ImageView addAddress, addPhone, addDate;
 
     AddressesAdapter addressesAdapter;
     PhoneAdapter phoneAdapter;
@@ -33,12 +50,13 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
     List<Address> addressesData = new ArrayList<>();
     List<Phone> phonesData = new ArrayList<>();
     List<Date> datesData = new ArrayList<>();
+    Name nameData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dummyData();
+//        dummyData();
         initialiseUI();
     }
 
@@ -51,7 +69,12 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
         phones = findViewById(R.id.phones_rv);
         dates = findViewById(R.id.dates_rv);
         addAddress = findViewById(R.id.add_address_iv);
+        addPhone = findViewById(R.id.add_phone_button);
+        addDate = findViewById(R.id.add_date_button);
         addAddress.setOnClickListener(this::addAddress);
+        addPhone.setOnClickListener(this::addPhone);
+        addDate.setOnClickListener(this::addDate);
+        save.setOnClickListener(this::saveContact);
 
         LinearLayoutManager addressLayoutManager = new LinearLayoutManager(this);
         LinearLayoutManager phoneLayoutManager = new LinearLayoutManager(this);
@@ -67,6 +90,115 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
         datesAdapter = new DatesAdapter(this, datesData);
         dates.setAdapter(datesAdapter);
         dates.setLayoutManager(dateLayoutManager);
+    }
+
+    private void saveContact(View view) {
+        nameData = new Name(fname.getText().toString(), mname.getText().toString(), lname.getText().toString());
+        Contact contact = new Contact(nameData, addressesData, phonesData, datesData);
+
+        Retrofit retrofit = RetrofitService.getInstance();
+        NodeAPI api = retrofit.create(NodeAPI.class);
+        Call<Object> call = api.addContact(contact);
+        call.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                System.out.println("Connection Status: "+response.code());
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                System.out.println("Error: "+t.getMessage());
+            }
+        });
+    }
+
+    private void addPhone(View view) {
+        Phone phoneObject = new Phone();
+        AlertDialog dialog;
+        View dialogView;
+        Button done, cancel;
+        EditText areacode, phone;
+        RadioGroup type;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        dialogView = inflater.inflate(R.layout.add_phone_view, null);
+        done = dialogView.findViewById(R.id.phone_item_bt_done);
+        cancel = dialogView.findViewById(R.id.phone_item_bt_cancel);
+        areacode = dialogView.findViewById(R.id.add_phone_et_areacode);
+        phone = dialogView.findViewById(R.id.add_phone_et_number);
+        type = dialogView.findViewById(R.id.add_phone_rg);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(dialogView);
+        dialog = builder.create();
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                phoneObject.setAreaCode(Integer.parseInt(areacode.getText().toString()));
+                phoneObject.setNumber(Integer.parseInt(phone.getText().toString()));
+                phoneObject.setPhoneType((String) dialogView.findViewById(type.getCheckedRadioButtonId()).getTag());
+                phonesData.add(phoneObject);
+                phoneAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    @SuppressLint("NewApi")
+    private void addDate(View view) {
+        Date dateObject = new Date();
+        java.util.Date selectedDate;
+        AlertDialog dialog;
+        View dialogView;
+        Button done, cancel;
+        EditText type;
+        DatePicker date;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        dialogView = inflater.inflate(R.layout.add_date_view,null);
+        done = dialogView.findViewById(R.id.add_date_bt_done);
+        cancel = dialogView.findViewById(R.id.add_date_bt_cancel);
+        type = dialogView.findViewById(R.id.add_date_et_type);
+        date = dialogView.findViewById(R.id.add_date_et_date);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(dialogView);
+        dialog = builder.create();
+
+        date.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                SimpleDateFormat formatter = new SimpleDateFormat();
+                formatter.applyPattern("MM-dd-YYYY");
+                try {
+                    dateObject.setDate(formatter.parse((monthOfYear+1)+"-"+dayOfMonth+"-"+year));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dateObject.setDateType(type.getText().toString());
+                datesData.add(dateObject);
+                datesAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     private void addAddress(View view) {
@@ -96,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
                 addressObject.setCity(city.getText().toString());
                 addressObject.setState(state.getText().toString());
                 addressObject.setZipcode(Integer.parseInt(zipcode.getText().toString()));
-                addressObject.setAddressType((String)type.getTag());
+                addressObject.setAddressType((String)dialogView.findViewById(type.getCheckedRadioButtonId()).getTag());
                 addressesData.add(addressObject);
                 addressesAdapter.notifyDataSetChanged();
                 dialog.dismiss();

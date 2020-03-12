@@ -34,7 +34,7 @@
         app:layout_constraintTop_toTopOf="@+id/add_phone_et_areacode" />
 
     <RadioGroup
-        android:id="@+id/radioGroup"
+        android:id="@+id/add_phone_rg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -80,7 +80,7 @@
         android:text="Done"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/add_phone_rg" />
 
     <Button
         android:id="@+id/phone_item_bt_cancel"

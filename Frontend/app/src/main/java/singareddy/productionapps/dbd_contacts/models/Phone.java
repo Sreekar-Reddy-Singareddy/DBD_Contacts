@@ -20,6 +20,10 @@ public class Phone {
         this._id = _id;
     }
 
+    public Phone() {
+
+    }
+
     public String getPhoneType() {
         return phoneType;
     }
