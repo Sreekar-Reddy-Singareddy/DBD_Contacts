@@ -93,7 +93,14 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
     }
 
     private void saveContact(View view) {
-        nameData = new Name(fname.getText().toString(), mname.getText().toString(), lname.getText().toString());
+        String fName = fname.getText().toString().trim();
+        String mName = mname.getText().toString().trim();
+        String lName = lname.getText().toString().trim();
+        if (fName.length() > 1) fName = fName.substring(0,1).toUpperCase() + fName.substring(1);
+        if (mName.length() > 1) mName = mName.substring(0,1).toUpperCase() + mName.substring(1);
+        if (lName.length() > 1) lName = lName.substring(0,1).toUpperCase() + lName.substring(1);
+
+        nameData = new Name(fName, mName, lName);
         Contact contact = new Contact(nameData, addressesData, phonesData, datesData);
 
         Retrofit retrofit = RetrofitService.getInstance();

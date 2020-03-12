@@ -3,6 +3,7 @@ var URL_PARSER = require("url")
 var MYSQL = require("mysql")
 var AXIOS = require("axios")
 var ADD_CONTACT = require("./Add_Contact.js")
+var FETCH_CONTACT = require("./Fetch_Contact.js")
 
 // Create a MySQL Connection here
 var sqlConn = MYSQL.createConnection({ host: "127.0.0.1", user: "sreekar", password: "sreekar2019" });
@@ -26,14 +27,12 @@ function processHttpRequest (data, url, res) {
         res.write("Modify Contact\n");
     } else if (action == "/remove") {
         res.write("Remove Contact\n");
-    } else if (action == "/retrieve") {
-        res.write("Retrieve Contact\n");
     }
 }
 
 function handleGetRequest (req, res) {
-    // Nothing for now
-    res.end();
+    var parsedURL = URL_PARSER.parse(req.url, true);
+    FETCH_CONTACT(parsedURL.query, res, sqlConn);
 }
 
 // Handle the POST Http requests here
@@ -54,6 +53,10 @@ HTTP.createServer(function (req, res) {
     if (req.method == "POST") {
         console.log("HTTP Post Request Made.")
         handlePostRequest(req, res);
+    }
+    else if (req.method == "GET") {
+        console.log("HTTP Get Request Made.");
+        handleGetRequest(req, res);
     }
 }).listen(3000, "0.0.0.0");
 
