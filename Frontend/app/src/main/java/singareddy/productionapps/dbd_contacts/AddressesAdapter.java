@@ -47,12 +47,22 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     private LayoutInflater inflater;
     private List<Address> addresses;
     private AddressListener listener;
+    private boolean newContact;
 
-    public AddressesAdapter(Context context, List<Address> addresses, AddressListener listener){
+    public AddressesAdapter(Context context, List<Address> addresses, AddressListener listener, boolean newContact){
         this.context = context;
         this.addresses = addresses;
         this.inflater = LayoutInflater.from(context);
         this.listener = listener;
+        this.newContact = newContact;
+    }
+
+    public boolean isNewContact() {
+        return newContact;
+    }
+
+    public void setNewContact(boolean newContact) {
+        this.newContact = newContact;
     }
 
     @Override
@@ -70,6 +80,8 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     @Override
     public void onBindViewHolder(@NonNull Address_VH address_vh, int i) {
         Address address = addresses.get(i);
+        if (!newContact) address_vh.delete.setVisibility(View.GONE);
+        else address_vh.delete.setVisibility(View.VISIBLE);
         address_vh.address.setText(address.getAddress());
         address_vh.city.setText(address.getCity());
         address_vh.state.setText(address.getState()+" - "+address.getZipcode());

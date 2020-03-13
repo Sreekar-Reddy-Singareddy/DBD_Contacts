@@ -24,6 +24,8 @@ public class DatesAdapter extends RecyclerView.Adapter<DatesAdapter.DatesVH> {
         public DatesVH (View view) {
             super(view);
             delete = view.findViewById(R.id.date_item_iv_delete);
+            if (newContact) delete.setVisibility(View.VISIBLE);
+            else  delete.setVisibility(View.GONE);
             type = view.findViewById(R.id.date_item_tv_type);
             date = view.findViewById(R.id.date_item_tv_date);
             delete.setOnClickListener(new View.OnClickListener() {
@@ -39,11 +41,21 @@ public class DatesAdapter extends RecyclerView.Adapter<DatesAdapter.DatesVH> {
     private Context context;
     private List<Date> dates;
     private LayoutInflater inflater;
+    private boolean newContact;
 
-    public DatesAdapter (Context c, List<Date> data) {
+    public DatesAdapter (Context c, List<Date> data, boolean n) {
         context = c;
         dates = data;
         inflater = LayoutInflater.from(context);
+        newContact = n;
+    }
+
+    public boolean isNewContact() {
+        return newContact;
+    }
+
+    public void setNewContact(boolean newContact) {
+        this.newContact = newContact;
     }
 
     @Override
@@ -60,6 +72,8 @@ public class DatesAdapter extends RecyclerView.Adapter<DatesAdapter.DatesVH> {
     @Override
     public void onBindViewHolder(@NonNull DatesVH datesVH, int i) {
         Date dateObject = dates.get(i);
+        if (newContact) datesVH.delete.setVisibility(View.VISIBLE);
+        else  datesVH.delete.setVisibility(View.GONE);
         datesVH.type.setText(dateObject.getDateType());
         SimpleDateFormat format = new SimpleDateFormat();
         format.applyPattern("MM-dd-YYYY");

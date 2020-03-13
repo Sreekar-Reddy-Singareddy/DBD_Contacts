@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -27,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,6 +42,8 @@ import singareddy.productionapps.dbd_contacts.models.Name;
 import singareddy.productionapps.dbd_contacts.models.Date;
 import singareddy.productionapps.dbd_contacts.models.Phone;
 
+import static android.view.View.GONE;
+
 public class ContactDetailsActivity extends AppCompatActivity implements AddressListener{
 
     private static boolean NEW_CONTACT = true;
@@ -47,6 +53,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
     private RecyclerView addresses, phones, dates;
     private Button save;
     private ImageView addAddress, addPhone, addDate;
+    private MenuItem edit, delete;
 
     AddressesAdapter addressesAdapter;
     PhoneAdapter phoneAdapter;
@@ -92,22 +99,68 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         LinearLayoutManager addressLayoutManager = new LinearLayoutManager(this);
         LinearLayoutManager phoneLayoutManager = new LinearLayoutManager(this);
         LinearLayoutManager dateLayoutManager = new LinearLayoutManager(this);
-        addressesAdapter = new AddressesAdapter(this, addressesData, this);
+        addressesAdapter = new AddressesAdapter(this, addressesData, this, NEW_CONTACT);
         addresses.setLayoutManager(addressLayoutManager);
         addresses.setAdapter(addressesAdapter);
 
-        phoneAdapter = new PhoneAdapter(this, phonesData);
+        phoneAdapter = new PhoneAdapter(this, phonesData, NEW_CONTACT);
         phones.setAdapter(phoneAdapter);
         phones.setLayoutManager(phoneLayoutManager);
 
-        datesAdapter = new DatesAdapter(this, datesData);
+        datesAdapter = new DatesAdapter(this, datesData, NEW_CONTACT);
         dates.setAdapter(datesAdapter);
         dates.setLayoutManager(dateLayoutManager);
+    }
 
+    private void toggleViews() {
         // Toggle views based on the new or old contact
         if (!NEW_CONTACT) {
-            save.setVisibility(View.GONE);
+            save.setVisibility(GONE);
+            addAddress.setVisibility(GONE);
+            addPhone.setVisibility(GONE);
+            addDate.setVisibility(GONE);
+            edit.setVisible(true); edit.setEnabled(true);
+            fname.setEnabled(false);
+            mname.setEnabled(false);
+            lname.setEnabled(false);
         }
+        else {
+            save.setVisibility(View.VISIBLE);
+            addAddress.setVisibility(View.VISIBLE);
+            addPhone.setVisibility(View.VISIBLE);
+            addDate.setVisibility(View.VISIBLE);
+            edit.setVisible(false); edit.setEnabled(false);
+            fname.setEnabled(true);
+            mname.setEnabled(true);
+            lname.setEnabled(true);
+        }
+        addressesAdapter.setNewContact(NEW_CONTACT);
+        phoneAdapter.setNewContact(NEW_CONTACT);
+        datesAdapter.setNewContact(NEW_CONTACT);
+        addressesAdapter.notifyDataSetChanged();
+        phoneAdapter.notifyDataSetChanged();
+        datesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.edit_menu_item){
+            NEW_CONTACT = !NEW_CONTACT;
+            toggleViews();
+        }
+        else if (item.getItemId() == R.id.delete_menu_item) {
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.contact_details_menu, menu);
+        edit = menu.findItem(R.id.edit_menu_item);
+        delete = menu.findItem(R.id.delete_menu_item);
+        toggleViews();
+        return true;
     }
 
     @Override

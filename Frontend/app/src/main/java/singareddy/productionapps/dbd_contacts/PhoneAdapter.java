@@ -37,11 +37,21 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.PhoneVH> {
     private Context context;
     private LayoutInflater inflater;
     private List<Phone> phones;
+    private boolean newContact;
 
-    public PhoneAdapter(Context c, List<Phone> data) {
+    public PhoneAdapter(Context c, List<Phone> data, boolean n) {
         context = c;
         phones = data;
         inflater = LayoutInflater.from(context);
+        newContact = n;
+    }
+
+    public boolean isNewContact() {
+        return newContact;
+    }
+
+    public void setNewContact(boolean newContact) {
+        this.newContact = newContact;
     }
 
     @Override
@@ -58,6 +68,8 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.PhoneVH> {
     @Override
     public void onBindViewHolder(@NonNull PhoneVH phoneVH, int i) {
         Phone phoneObject = phones.get(i);
+        if (newContact) phoneVH.delete.setVisibility(View.VISIBLE);
+        else  phoneVH.delete.setVisibility(View.GONE);
         phoneVH.phone.setText(phoneObject.getAreaCode().toString()+"-"+phoneObject.getNumber().toString());
         phoneVH.type.setText(phoneObject.getPhoneType());
     }
