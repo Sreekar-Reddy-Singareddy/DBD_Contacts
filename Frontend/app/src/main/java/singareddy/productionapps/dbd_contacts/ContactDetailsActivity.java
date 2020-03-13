@@ -149,7 +149,22 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             toggleViews();
         }
         else if (item.getItemId() == R.id.delete_menu_item) {
+            Retrofit retrofit = RetrofitService.getInstance();
+            NodeAPI api = retrofit.create(NodeAPI.class);
+            Call<Integer> call = api.deleteContact(ID);
+            call.enqueue(new Callback<Integer>() {
+                @Override
+                public void onResponse(Call<Integer> call, Response<Integer> response) {
+                    System.out.println("Deleted: "+response.body());
+                    System.out.println("Code: "+response.code());
+                    finish();
+                }
 
+                @Override
+                public void onFailure(Call<Integer> call, Throwable t) {
+                    System.out.println("Exception: "+t.getMessage());
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
     }

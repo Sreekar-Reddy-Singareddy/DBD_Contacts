@@ -6,6 +6,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -24,4 +25,7 @@ public interface NodeAPI {
 
     @GET("/fetch")
     public Call<Contact> getContactWithID(@Query("contact_id") int id);
+
+    @DELETE("/delete")
+    public Call<Integer> deleteContact(@Query("contact_id") int id);
 }

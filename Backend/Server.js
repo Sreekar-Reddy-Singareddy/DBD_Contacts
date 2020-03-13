@@ -4,6 +4,7 @@ var MYSQL = require("mysql")
 var AXIOS = require("axios")
 var ADD_CONTACT = require("./Add_Contact.js")
 var FETCH_CONTACT = require("./Fetch_Contact.js")
+var DELETE_CONTACT = require("./Delete_Contact.js")
 
 // Create a MySQL Connection here
 var sqlConn = MYSQL.createConnection({ host: "127.0.0.1", user: "sreekar", password: "sreekar2019" });
@@ -48,6 +49,12 @@ function handlePostRequest (req, res) {
     });
 }
 
+// Handle the DELETE Http requests here
+function handleDeletRequest (req, res) {
+    var parsedUrl = URL_PARSER.parse(req.url, true);
+    DELETE_CONTACT(parsedUrl.query.contact_id, sqlConn, res);
+}
+
 // Create the HTTP Server on port 8000
 HTTP.createServer(function (req, res) {
     if (req.method == "POST") {
@@ -57,6 +64,10 @@ HTTP.createServer(function (req, res) {
     else if (req.method == "GET") {
         console.log("HTTP Get Request Made.");
         handleGetRequest(req, res);
+    }
+    else if (req.method == "DELETE") {
+        console.log("HTTP Delete Request Made");
+        handleDeletRequest(req, res);
     }
 }).listen(3000, "0.0.0.0");
 

@@ -11,7 +11,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorPrimaryDark"></View>
+        android:background="#55000000"></View>
 
     <TextView
         android:id="@+id/address_item_tv_address"

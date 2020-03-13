@@ -25,6 +25,7 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
     private FloatingActionButton addContact;
     private AllContactsAdapter adapter;
     private List<Contact> contactsData;
+    private String searchCriteria = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,12 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
         contactsData = new ArrayList<>();
         initialiseData();
         initialiseUI();
+    }
+
+    @Override
+    protected void onResume() {
+        getContactsContaining(searchCriteria);
+        super.onResume();
     }
 
     private void initialiseData() {
@@ -55,6 +62,7 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                searchCriteria = query;
                 searchView.clearFocus();
                 return false;
             }
@@ -62,6 +70,7 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Use this string to make new http calls and get the contacts
+                searchCriteria = newText;
                 getContactsContaining(newText);
                 return false;
             }
