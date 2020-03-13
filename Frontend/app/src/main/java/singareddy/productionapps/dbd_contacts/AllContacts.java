@@ -9,8 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.SearchView;
 
-import org.w3c.dom.Node;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +47,8 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
         addContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AllContacts.this, MainActivity.class);
+                Intent intent = new Intent(AllContacts.this, ContactDetailsActivity.class);
+                intent.putExtra("New",true);
                 startActivity(intent);
             }
         });
@@ -94,6 +93,10 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
 
     @Override
     public void onContactItemClicked(Contact contact) {
-
+        int id = contact.getNameData().get_id();
+        Intent intent = new Intent(this, ContactDetailsActivity.class);
+        intent.putExtra("Contact_Id", id);
+        intent.putExtra("New", false);
+        startActivityForResult(intent, 123);
     }
 }

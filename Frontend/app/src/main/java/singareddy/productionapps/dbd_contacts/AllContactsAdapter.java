@@ -19,6 +19,12 @@ public class AllContactsAdapter extends RecyclerView.Adapter<AllContactsAdapter.
         private TextView name, abbr;
         public AllContactsVH (View view) {
             super(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onContactItemClicked(contacts.get(getAdapterPosition()));
+                }
+            });
             name = view.findViewById(R.id.contact_item_tv_name);
             abbr = view.findViewById(R.id.contact_item_tv_abbr);
         }

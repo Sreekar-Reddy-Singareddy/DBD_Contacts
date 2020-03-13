@@ -21,4 +21,7 @@ public interface NodeAPI {
 
     @GET("/fetch")
     public Call<List<Contact>> getAllContacts(@Query("search_criteria") String searcQuery);
+
+    @GET("/fetch")
+    public Call<Contact> getContactWithID(@Query("contact_id") int id);
 }

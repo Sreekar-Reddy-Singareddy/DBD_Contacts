@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +38,10 @@ import singareddy.productionapps.dbd_contacts.models.Name;
 import singareddy.productionapps.dbd_contacts.models.Date;
 import singareddy.productionapps.dbd_contacts.models.Phone;
 
-public class MainActivity extends AppCompatActivity implements AddressListener{
+public class ContactDetailsActivity extends AppCompatActivity implements AddressListener{
+
+    private static boolean NEW_CONTACT = true;
+    private static int ID = -1;
 
     private EditText fname, mname, lname;
     private RecyclerView addresses, phones, dates;
@@ -56,7 +60,16 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        dummyData();
+        if (getIntent().getExtras().getBoolean("New") == true) {
+            // This is new contact
+            NEW_CONTACT = true;
+        }
+        else {
+            // This is old contact, here to modify
+            NEW_CONTACT = false;
+            ID = getIntent().getExtras().getInt("Contact_Id");
+        }
+        dummyData();
         initialiseUI();
     }
 
@@ -90,6 +103,45 @@ public class MainActivity extends AppCompatActivity implements AddressListener{
         datesAdapter = new DatesAdapter(this, datesData);
         dates.setAdapter(datesAdapter);
         dates.setLayoutManager(dateLayoutManager);
+
+        // Toggle views based on the new or old contact
+        if (!NEW_CONTACT) {
+            save.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!NEW_CONTACT){
+            Retrofit retrofit = RetrofitService.getInstance();
+            NodeAPI api = retrofit.create(NodeAPI.class);
+            Call<Contact> call = api.getContactWithID(ID);
+            call.enqueue(new Callback<Contact>() {
+                @Override
+                public void onResponse(Call<Contact> call, Response<Contact> response) {
+                    Contact contact = response.body();
+                    Name nameObj = contact.getNameData();
+                    List<Address> addressObj = contact.getAddressData();
+                    List<Phone> phoneObj = contact.getPhoneData();
+                    List<Date> dateObj = contact.getDateData();
+                    fname.setText(nameObj.getFname());
+                    mname.setText(nameObj.getMname());
+                    lname.setText(nameObj.getLname());
+                    addressesData.clear(); addressesData.addAll(addressObj);
+                    phonesData.clear(); phonesData.addAll(phoneObj);
+                    datesData.clear(); datesData.addAll(dateObj);
+                    addressesAdapter.notifyDataSetChanged();
+                    phoneAdapter.notifyDataSetChanged();
+                    datesAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onFailure(Call<Contact> call, Throwable t) {
+                    System.out.println("Exception: "+t.getMessage());
+                }
+            });
+        }
     }
 
     private void saveContact(View view) {
