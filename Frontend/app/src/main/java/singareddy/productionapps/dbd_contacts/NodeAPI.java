@@ -14,18 +14,21 @@ import singareddy.productionapps.dbd_contacts.models.Contact;
 import singareddy.productionapps.dbd_contacts.models.Name;
 
 public interface NodeAPI {
-    @GET("/add")
+    @GET("")
     public Call<Name> testServer();
 
     @POST("/add")
     public Call<Object> addContact(@Body Contact contact);
 
-    @GET("/fetch")
+    @GET("/")
     public Call<List<Contact>> getAllContacts(@Query("search_criteria") String searcQuery);
 
-    @GET("/fetch")
+    @GET("/")
     public Call<Contact> getContactWithID(@Query("contact_id") int id);
 
-    @DELETE("/delete")
+    @DELETE("/")
     public Call<Integer> deleteContact(@Query("contact_id") int id);
+
+    @POST("/update")
+    public Call<Integer> updateContact(@Body Contact contactBeingDisplayed);
 }

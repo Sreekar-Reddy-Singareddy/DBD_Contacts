@@ -95,7 +95,7 @@ public class AllContacts extends AppCompatActivity implements ContactItemListene
 
             @Override
             public void onFailure(Call<List<Contact>> call, Throwable t) {
-                System.out.println("Exception: "+t.getMessage());
+                System.out.println("Exception *: "+t.getMessage());
             }
         });
     }

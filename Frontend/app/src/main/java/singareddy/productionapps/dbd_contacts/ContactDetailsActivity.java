@@ -54,6 +54,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
     private Button save;
     private ImageView addAddress, addPhone, addDate;
     private MenuItem edit, delete;
+    private Contact contactBeingDisplayed;
 
     AddressesAdapter addressesAdapter;
     PhoneAdapter phoneAdapter;
@@ -70,6 +71,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         if (getIntent().getExtras().getBoolean("New") == true) {
             // This is new contact
             NEW_CONTACT = true;
+            ID = -1;
         }
         else {
             // This is old contact, here to modify
@@ -110,6 +112,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         datesAdapter = new DatesAdapter(this, datesData, NEW_CONTACT);
         dates.setAdapter(datesAdapter);
         dates.setLayoutManager(dateLayoutManager);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     private void toggleViews() {
@@ -188,11 +195,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             call.enqueue(new Callback<Contact>() {
                 @Override
                 public void onResponse(Call<Contact> call, Response<Contact> response) {
-                    Contact contact = response.body();
-                    Name nameObj = contact.getNameData();
-                    List<Address> addressObj = contact.getAddressData();
-                    List<Phone> phoneObj = contact.getPhoneData();
-                    List<Date> dateObj = contact.getDateData();
+                    contactBeingDisplayed = response.body();
+                    Name nameObj = contactBeingDisplayed.getNameData();
+                    List<Address> addressObj = contactBeingDisplayed.getAddressData();
+                    List<Phone> phoneObj = contactBeingDisplayed.getPhoneData();
+                    List<Date> dateObj = contactBeingDisplayed.getDateData();
                     fname.setText(nameObj.getFname());
                     mname.setText(nameObj.getMname());
                     lname.setText(nameObj.getLname());
@@ -221,6 +228,12 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         if (lName.length() > 1) lName = lName.substring(0,1).toUpperCase() + lName.substring(1);
 
         nameData = new Name(fName, mName, lName);
+        if (ID >= 0) {
+            nameData.set_id(ID);
+            contactBeingDisplayed.setNameData(nameData);
+            updateContact();
+            return;
+        }
         Contact contact = new Contact(nameData, addressesData, phonesData, datesData);
 
         Retrofit retrofit = RetrofitService.getInstance();
@@ -235,6 +248,26 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
                 System.out.println("Error: "+t.getMessage());
+            }
+        });
+    }
+
+    private void updateContact() {
+        contactBeingDisplayed.setAddressData(addressesData);
+        contactBeingDisplayed.setPhoneData(phonesData);
+        contactBeingDisplayed.setDateData(datesData);
+        Retrofit retrofit = RetrofitService.getInstance();
+        NodeAPI api = retrofit.create(NodeAPI.class);
+        Call<Integer> call = api.updateContact(contactBeingDisplayed);
+        call.enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                System.out.println("Response: "+response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+                System.out.println("Exception: "+t.getMessage());
             }
         });
     }

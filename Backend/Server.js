@@ -5,6 +5,7 @@ var AXIOS = require("axios")
 var ADD_CONTACT = require("./Add_Contact.js")
 var FETCH_CONTACT = require("./Fetch_Contact.js")
 var DELETE_CONTACT = require("./Delete_Contact.js")
+var UPDATE_CONTACT = require("./Update_Contact.js");
 
 // Create a MySQL Connection here
 var sqlConn = MYSQL.createConnection({ host: "127.0.0.1", user: "sreekar", password: "sreekar2019" });
@@ -23,11 +24,12 @@ function processHttpRequest (data, url, res) {
 
     if (action == "/add") {
         res.write("Add Contact");
-        ADD_CONTACT(sqlConn, data, res)
-    } else if (action == "/modify") {
+        console.log("Insert the contact here.");
+        ADD_CONTACT.addCon(sqlConn, data, res)
+    } else if (action == "/update") {
         res.write("Modify Contact\n");
-    } else if (action == "/remove") {
-        res.write("Remove Contact\n");
+        console.log("Update the contact here.");
+        UPDATE_CONTACT(sqlConn, data, res);
     }
 }
 
@@ -44,19 +46,20 @@ function handlePostRequest (req, res) {
     })
     .on('end', () => {
         data = JSON.parse(data);
-        console.log("*** Data ***\n" + JSON.stringify(data));
+        // console.log("*** Data ***\n" + JSON.stringify(data));
         processHttpRequest(data, req.url, res);
     });
 }
 
 // Handle the DELETE Http requests here
-function handleDeletRequest (req, res) {
+function handleDeleteRequest (req, res) {
     var parsedUrl = URL_PARSER.parse(req.url, true);
     DELETE_CONTACT(parsedUrl.query.contact_id, sqlConn, res);
 }
 
 // Create the HTTP Server on port 8000
 HTTP.createServer(function (req, res) {
+    // console.log("====== Request: "+req.id + " &&& Response: "+res.id+" ======");
     if (req.method == "POST") {
         console.log("HTTP Post Request Made.")
         handlePostRequest(req, res);
@@ -67,10 +70,6 @@ HTTP.createServer(function (req, res) {
     }
     else if (req.method == "DELETE") {
         console.log("HTTP Delete Request Made");
-        handleDeletRequest(req, res);
+        handleDeleteRequest(req, res);
     }
 }).listen(3000, "0.0.0.0");
-
-// Making some duplicate requests
-var contact = { contact: { fname: "Prathyusha", mname: "", lname: "Samala" } }
-//axios.post("http://localhost:8000/add", contact)

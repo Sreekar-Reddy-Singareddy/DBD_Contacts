@@ -13,7 +13,7 @@ function getAllDates (sqlConn, id) {
         });
         mainContactObject.dateData = dates;
         responseObj.write(JSON.stringify(mainContactObject));
-        console.log("========== JSON FINAL ===========\n"+JSON.stringify(mainContactObject));
+        // console.log("========== JSON FINAL ===========\n"+JSON.stringify(mainContactObject));
         responseObj.end();
     })
 }
@@ -41,7 +41,7 @@ function getAddressesOfContact (sqlConn, id) {
         Object.keys(res).forEach(key => {
             var a = res[key];
             var obj = {_id: a.Address_Id, contactId: a.Contact_Id, addressType: a.Address_Type, address: a.Address, city: a.City, state: a.State, zipcode: a.Zipcode};
-            console.log("*** Address ***\n"+JSON.stringify(obj))
+            // console.log("*** Address ***\n"+JSON.stringify(obj))
             addresses.push(obj);
         });
         mainContactObject.addressData = addresses;
@@ -50,7 +50,8 @@ function getAddressesOfContact (sqlConn, id) {
 }
 
 // Gets the contact with specific ID
-function getContactWithID (sqlConn, id) {
+function getContactWithID (sqlConn, id, res) {
+    responseObj = res;
     mainContactObject = {nameData:"", addressData: "", phoneData: "", dateData: ""}
     var sqlQuery = "select * from dbd_class.contact where contact_id = ?;";
     sqlConn.query(sqlQuery, id, (err, result) => {
@@ -64,7 +65,8 @@ function getContactWithID (sqlConn, id) {
 }
 
 // Gets all the contacts that match the search query
-function getAllContacts (sqlConn, queryParams) {
+function getAllContacts (sqlConn, queryParams, res) {
+    responseObj = res;
     console.log(queryParams);
     var sqlQuery = "select * from dbd_class.contact c " +
     "join " +
@@ -87,7 +89,7 @@ function getAllContacts (sqlConn, queryParams) {
             var name = {nameData: {_id: row.contact_id, fname: row.Fname, mname: row.Mname, lname: row.Lname}};
             allContacts.push(name);
         });
-        console.log(JSON.stringify({contacts: allContacts}));
+        // console.log(JSON.stringify({contacts: allContacts}));
         responseObj.write(JSON.stringify(allContacts));
         responseObj.end();
     });
@@ -95,13 +97,11 @@ function getAllContacts (sqlConn, queryParams) {
 
 // Fetches the list of contacts that match criteria
 var fetchContact = function (queryParams, res, sqlConn) {
-    responseObj = res;
     if ('search_criteria' in queryParams) {
-        getAllContacts(sqlConn, queryParams);
+        getAllContacts(sqlConn, queryParams, res);
     }
     else if ('contact_id' in queryParams) {
-        console.log(queryParams.contact_id)
-        getContactWithID(sqlConn, queryParams.contact_id);
+        getContactWithID(sqlConn, queryParams.contact_id, res);
     }
 }
 
