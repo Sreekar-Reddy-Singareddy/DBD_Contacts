@@ -74,52 +74,19 @@
         app:layout_constraintStart_toEndOf="@+id/add_address_tv_state"
         app:layout_constraintTop_toTopOf="@+id/add_address_tv_state" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="Address Type"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_address_tv_state" />
-
-    <RadioGroup
+    <EditText
         android:id="@+id/add_address_rg_types"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:orientation="horizontal"
+        android:ems="10"
+        android:hint="Address Type"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
-
-        <RadioButton
-            android:id="@+id/rb_home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:tag="Home"
-            android:text="Home" />
-
-        <RadioButton
-            android:id="@+id/rb_work"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:tag="Work"
-            android:text="Work" />
-
-        <RadioButton
-            android:id="@+id/rb_business"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:tag="Business"
-            android:text="Business" />
-    </RadioGroup>
+        app:layout_constraintTop_toBottomOf="@+id/add_address_tv_state" />
 
     <Button
         android:id="@+id/add_address_bt_cancel"

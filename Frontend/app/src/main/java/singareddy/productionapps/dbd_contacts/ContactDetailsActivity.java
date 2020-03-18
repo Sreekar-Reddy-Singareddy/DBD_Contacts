@@ -1,6 +1,9 @@
 package singareddy.productionapps.dbd_contacts;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,21 +19,12 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Node;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,7 +38,7 @@ import singareddy.productionapps.dbd_contacts.models.Phone;
 
 import static android.view.View.GONE;
 
-public class ContactDetailsActivity extends AppCompatActivity implements AddressListener{
+public class ContactDetailsActivity extends AppCompatActivity implements AddressListener, PhoneListener, DateListener{
 
     private static boolean NEW_CONTACT = true;
     private static int ID = -1;
@@ -105,11 +99,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         addresses.setLayoutManager(addressLayoutManager);
         addresses.setAdapter(addressesAdapter);
 
-        phoneAdapter = new PhoneAdapter(this, phonesData, NEW_CONTACT);
+        phoneAdapter = new PhoneAdapter(this, phonesData, NEW_CONTACT, this);
         phones.setAdapter(phoneAdapter);
         phones.setLayoutManager(phoneLayoutManager);
 
-        datesAdapter = new DatesAdapter(this, datesData, NEW_CONTACT);
+        datesAdapter = new DatesAdapter(this, datesData, NEW_CONTACT, this);
         dates.setAdapter(datesAdapter);
         dates.setLayoutManager(dateLayoutManager);
     }
@@ -156,22 +150,37 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             toggleViews();
         }
         else if (item.getItemId() == R.id.delete_menu_item) {
-            Retrofit retrofit = RetrofitService.getInstance();
-            NodeAPI api = retrofit.create(NodeAPI.class);
-            Call<Integer> call = api.deleteContact(ID);
-            call.enqueue(new Callback<Integer>() {
-                @Override
-                public void onResponse(Call<Integer> call, Response<Integer> response) {
-                    System.out.println("Deleted: "+response.body());
-                    System.out.println("Code: "+response.code());
-                    finish();
-                }
+            AlertDialog dialog = new AlertDialog.Builder(this).
+                    setMessage("You are about to delete the contact permanently. Do you wish to proceed?").
+                    setTitle("Delete Contact").
+                    setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Retrofit retrofit = RetrofitService.getInstance();
+                            NodeAPI api = retrofit.create(NodeAPI.class);
+                            Call<Integer> call = api.deleteContact(ID);
+                            call.enqueue(new Callback<Integer>() {
+                                @Override
+                                public void onResponse(Call<Integer> call, Response<Integer> response) {
+                                    System.out.println("Deleted: "+response.body());
+                                    System.out.println("Code: "+response.code());
+                                    finish();
+                                }
 
-                @Override
-                public void onFailure(Call<Integer> call, Throwable t) {
-                    System.out.println("Exception: "+t.getMessage());
-                }
-            });
+                                @Override
+                                public void onFailure(Call<Integer> call, Throwable t) {
+                                    System.out.println("Exception: "+t.getMessage());
+                                }
+                            });
+                        }
+                    }).
+                    setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
+            dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -220,6 +229,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
     }
 
     private void saveContact(View view) {
+        if (emptyFieldsInName()) {
+            Toast.makeText(this, "First and Last names are mandatory.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         String fName = fname.getText().toString().trim();
         String mName = mname.getText().toString().trim();
         String lName = lname.getText().toString().trim();
@@ -242,7 +256,8 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         call.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-                System.out.println("Connection Status: "+response.code());
+                Toast.makeText(ContactDetailsActivity.this, "Added Successfully",Toast.LENGTH_LONG).show();
+                finish();
             }
 
             @Override
@@ -252,33 +267,109 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         });
     }
 
+    private boolean emptyFieldsInName() {
+        return fname.getText().toString().isEmpty() || lname.getText().toString().isEmpty();
+    }
+
     private void updateContact() {
         contactBeingDisplayed.setAddressData(addressesData);
         contactBeingDisplayed.setPhoneData(phonesData);
         contactBeingDisplayed.setDateData(datesData);
         Retrofit retrofit = RetrofitService.getInstance();
         NodeAPI api = retrofit.create(NodeAPI.class);
-        Call<Integer> call = api.updateContact(contactBeingDisplayed);
-        call.enqueue(new Callback<Integer>() {
+        Call<Object> call = api.updateContact(contactBeingDisplayed);
+        call.enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
-                System.out.println("Response: "+response.body());
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                System.out.println("**** Added Contact");
+                Toast.makeText(ContactDetailsActivity.this, "Update Successful",Toast.LENGTH_LONG).show();
+                finish();
             }
 
             @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 System.out.println("Exception: "+t.getMessage());
             }
         });
     }
 
     private void addPhone(View view) {
-        Phone phoneObject = new Phone();
+        phoneEditor("New", null);
+    }
+
+    @SuppressLint("NewApi")
+    private void addDate(View view) {
+        dateEditor("New", null);
+    }
+
+    private void addAddress(View view) {
+        addressEditor("New", null);
+    }
+
+    private void addressEditor(String kind, Address addressObject) {
+        if (kind.equals("New")) {
+            addressObject = new Address();
+        }
+        AlertDialog dialog;
+        View dialogView;
+        Button done, cancel;
+        EditText address, city, state, zipcode;
+        EditText type;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        dialogView = inflater.inflate(R.layout.add_address_view, null);
+        address = dialogView.findViewById(R.id.add_address_tv_address);
+        city = dialogView.findViewById(R.id.add_address_tv_city);
+        state = dialogView.findViewById(R.id.add_address_tv_state);
+        zipcode = dialogView.findViewById(R.id.add_address_tv_zipcode);
+        type = dialogView.findViewById(R.id.add_address_rg_types);
+        done = dialogView.findViewById(R.id.add_address_bt_done);
+        cancel = dialogView.findViewById(R.id.add_address_bt_cancel);
+
+        if (!kind.equals("New")) {
+            address.setText(addressObject.getAddress());
+            city.setText(addressObject.getCity());
+            state.setText(addressObject.getState());
+            if (addressObject.getZipcode() != 0) zipcode.setText(addressObject.getZipcode().toString());
+            type.setText(addressObject.getAddressType());
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(dialogView);
+        dialog = builder.create();
+
+        Address finalAddressObject = addressObject;
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ID > 0) finalAddressObject.setContactId(ID);
+                finalAddressObject.setAddress(address.getText().toString());
+                finalAddressObject.setCity(city.getText().toString());
+                finalAddressObject.setState(state.getText().toString());
+                finalAddressObject.setZipcode(Integer.parseInt(zipcode.getText().toString()));
+                finalAddressObject.setAddressType(type.getText().toString());
+                if (kind.equals("New")) addressesData.add(finalAddressObject);
+                addressesAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void phoneEditor (String kind, Phone phoneObject) {
+        if (kind.equals("New")) {
+            phoneObject = new Phone();
+        }
         AlertDialog dialog;
         View dialogView;
         Button done, cancel;
         EditText areacode, phone;
-        RadioGroup type;
+        EditText type;
         LayoutInflater inflater = LayoutInflater.from(this);
         dialogView = inflater.inflate(R.layout.add_phone_view, null);
         done = dialogView.findViewById(R.id.phone_item_bt_done);
@@ -287,17 +378,24 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         phone = dialogView.findViewById(R.id.add_phone_et_number);
         type = dialogView.findViewById(R.id.add_phone_rg);
 
+        if (!kind.equals("New")) {
+            areacode.setText(phoneObject.getAreaCode().toString());
+            phone.setText(phoneObject.getNumber().toString());
+            type.setText(phoneObject.getPhoneType());
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(dialogView);
         dialog = builder.create();
 
+        Phone finalPhoneObject = phoneObject;
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ID > 0) phoneObject.setContactId(ID);
-                phoneObject.setAreaCode(Integer.parseInt(areacode.getText().toString()));
-                phoneObject.setNumber(Integer.parseInt(phone.getText().toString()));
-                phoneObject.setPhoneType((String) dialogView.findViewById(type.getCheckedRadioButtonId()).getTag());
-                phonesData.add(phoneObject);
+                if (ID > 0) finalPhoneObject.setContactId(ID);
+                finalPhoneObject.setAreaCode(Integer.parseInt(areacode.getText().toString()));
+                finalPhoneObject.setNumber(Integer.parseInt(phone.getText().toString()));
+                finalPhoneObject.setPhoneType(type.getText().toString());
+                if (kind.equals("New")) phonesData.add(finalPhoneObject);
                 phoneAdapter.notifyDataSetChanged();
                 dialog.dismiss();
             }
@@ -312,15 +410,16 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         dialog.show();
     }
 
-    @SuppressLint("NewApi")
-    private void addDate(View view) {
-        Date dateObject = new Date();
-        java.util.Date selectedDate;
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void dateEditor (String kind, Date dateObject) {
+        if (kind.equals("New")) {
+            dateObject = new Date();
+        }
         AlertDialog dialog;
         View dialogView;
         Button done, cancel;
         EditText type;
-        DatePicker date;
+        EditText date;
         LayoutInflater inflater = LayoutInflater.from(this);
         dialogView = inflater.inflate(R.layout.add_date_view,null);
         done = dialogView.findViewById(R.id.add_date_bt_done);
@@ -328,27 +427,25 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         type = dialogView.findViewById(R.id.add_date_et_type);
         date = dialogView.findViewById(R.id.add_date_et_date);
 
+        if (!kind.equals("New")) {
+            type.setText(dateObject.getDateType());
+            SimpleDateFormat format = new SimpleDateFormat();
+            format.applyPattern("MM-dd-YYYY");
+            date.setText(format.format(dateObject.getDate()));
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(dialogView);
         dialog = builder.create();
 
-        date.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                SimpleDateFormat formatter = new SimpleDateFormat();
-                formatter.applyPattern("MM-dd-YYYY");
-                try {
-                    dateObject.setDate(formatter.parse((monthOfYear+1)+"-"+dayOfMonth+"-"+year));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        Date finalDateObject = dateObject;
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ID > 0) dateObject.setContactId(ID);
-                dateObject.setDateType(type.getText().toString());
-                datesData.add(dateObject);
+                if (ID > 0) finalDateObject.setContactId(ID);
+                finalDateObject.setDateType(type.getText().toString());
+                String[] dateComps = date.getText().toString().split("-");
+                finalDateObject.setDate(new java.util.Date(Integer.parseInt(dateComps[2])-1900, Integer.parseInt(dateComps[0])-1, Integer.parseInt(dateComps[1])));
+                if (kind.equals("New")) datesData.add(finalDateObject);
                 datesAdapter.notifyDataSetChanged();
                 dialog.dismiss();
             }
@@ -361,50 +458,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         });
 
         dialog.show();
-    }
 
-    private void addAddress(View view) {
-        Address addressObject = new Address();
-        AlertDialog dialog;
-        View dialogView;
-        Button done, cancel;
-        EditText address, city, state, zipcode;
-        RadioGroup type;
-        LayoutInflater inflater = LayoutInflater.from(this);
-        dialogView = inflater.inflate(R.layout.add_address_view, null);
-        address = dialogView.findViewById(R.id.add_address_tv_address);
-        city = dialogView.findViewById(R.id.add_address_tv_city);
-        state = dialogView.findViewById(R.id.add_address_tv_state);
-        zipcode = dialogView.findViewById(R.id.add_address_tv_zipcode);
-        type = dialogView.findViewById(R.id.add_address_rg_types);
-        done = dialogView.findViewById(R.id.add_address_bt_done);
-        cancel = dialogView.findViewById(R.id.add_address_bt_cancel);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(dialogView);
-        dialog = builder.create();
-
-        done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ID > 0) addressObject.setContactId(ID);
-                addressObject.setAddress(address.getText().toString());
-                addressObject.setCity(city.getText().toString());
-                addressObject.setState(state.getText().toString());
-                addressObject.setZipcode(Integer.parseInt(zipcode.getText().toString()));
-                addressObject.setAddressType((String)dialogView.findViewById(type.getCheckedRadioButtonId()).getTag());
-                addressesData.add(addressObject);
-                addressesAdapter.notifyDataSetChanged();
-                dialog.dismiss();
-            }
-        });
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
     }
 
     private void dummyData() {
@@ -425,6 +479,20 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
 
     @Override
     public void onAddressItemClicked(Address address) {
-        System.out.println("Address Clicked");
+        if (edit.isVisible()) return;
+        addressEditor("Old", address);
+    }
+
+    @Override
+    public void onPhoneItemClicked(Phone phone) {
+        if (edit.isVisible()) return;
+        phoneEditor("Old", phone);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onDateItemClicked(Date date) {
+        if (edit.isVisible()) return;
+        dateEditor("Old", date);
     }
 }

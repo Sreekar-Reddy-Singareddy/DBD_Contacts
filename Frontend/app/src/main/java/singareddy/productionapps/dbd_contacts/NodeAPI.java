@@ -1,7 +1,5 @@
 package singareddy.productionapps.dbd_contacts;
 
-import org.json.JSONObject;
-
 import java.util.List;
 
 import retrofit2.Call;
@@ -30,5 +28,5 @@ public interface NodeAPI {
     public Call<Integer> deleteContact(@Query("contact_id") int id);
 
     @POST("/update")
-    public Call<Integer> updateContact(@Body Contact contactBeingDisplayed);
+    public Call<Object> updateContact(@Body Contact contactBeingDisplayed);
 }

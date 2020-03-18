@@ -15,7 +15,6 @@ function deleteExistingSecondaryDetails(sqlConn, data, id, res) {
                 ADD_CONTACT.setResponse(res);
                 ADD_CONTACT.setFullContact(data);
                 ADD_CONTACT.secDetails(sqlConn);
-                res.write("143 Update Success");
             })
         })
     });

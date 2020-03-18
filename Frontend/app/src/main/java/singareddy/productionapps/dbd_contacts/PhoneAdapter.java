@@ -21,6 +21,12 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.PhoneVH> {
 
         public PhoneVH (View view) {
             super(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onPhoneItemClicked(phones.get(getAdapterPosition()));
+                }
+            });
             delete = view.findViewById(R.id.add_phone_et_areacode);
             phone = view.findViewById(R.id.date_item_tv_date);
             type = view.findViewById(R.id.date_item_tv_type);
@@ -38,12 +44,14 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.PhoneVH> {
     private LayoutInflater inflater;
     private List<Phone> phones;
     private boolean newContact;
+    private PhoneListener listener;
 
-    public PhoneAdapter(Context c, List<Phone> data, boolean n) {
+    public PhoneAdapter(Context c, List<Phone> data, boolean n, PhoneListener l) {
         context = c;
         phones = data;
         inflater = LayoutInflater.from(context);
         newContact = n;
+        listener = l;
     }
 
     public boolean isNewContact() {

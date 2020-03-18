@@ -57,7 +57,7 @@ public class AllContactsAdapter extends RecyclerView.Adapter<AllContactsAdapter.
     public void onBindViewHolder(@NonNull AllContactsVH allContactsVH, int i) {
         Name name = contacts.get(i).getNameData();
         String fname = name.getFname(), lname = name.getLname();
-        allContactsVH.name.setText(fname+" "+lname);
+        allContactsVH.name.setText(fname+" "+name.getMname()+" "+lname);
         allContactsVH.abbr.setText(fname.substring(0,1)+" "+lname.substring(0,1));
     }
 }

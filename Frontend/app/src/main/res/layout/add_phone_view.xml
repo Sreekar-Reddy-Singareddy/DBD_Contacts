@@ -33,42 +33,19 @@
         app:layout_constraintStart_toEndOf="@+id/add_phone_et_areacode"
         app:layout_constraintTop_toTopOf="@+id/add_phone_et_areacode" />
 
-    <RadioGroup
+    <EditText
         android:id="@+id/add_phone_rg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:orientation="horizontal"
+        android:ems="10"
+        android:hint="Phone Type"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_phone_et_number">
-
-        <RadioButton
-            android:id="@+id/radioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:tag="Home"
-            android:text="Home" />
-
-        <RadioButton
-            android:id="@+id/radioButton3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:tag="Work"
-            android:text="Work" />
-
-        <RadioButton
-            android:id="@+id/radioButton2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:tag="Business"
-            android:text="Business" />
-    </RadioGroup>
+        app:layout_constraintTop_toBottomOf="@+id/add_phone_et_areacode" />
 
     <Button
         android:id="@+id/phone_item_bt_done"

@@ -23,6 +23,12 @@ public class DatesAdapter extends RecyclerView.Adapter<DatesAdapter.DatesVH> {
 
         public DatesVH (View view) {
             super(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onDateItemClicked(dates.get(getAdapterPosition()));
+                }
+            });
             delete = view.findViewById(R.id.date_item_iv_delete);
             if (newContact) delete.setVisibility(View.VISIBLE);
             else  delete.setVisibility(View.GONE);
@@ -42,12 +48,14 @@ public class DatesAdapter extends RecyclerView.Adapter<DatesAdapter.DatesVH> {
     private List<Date> dates;
     private LayoutInflater inflater;
     private boolean newContact;
+    private DateListener listener;
 
-    public DatesAdapter (Context c, List<Date> data, boolean n) {
+    public DatesAdapter (Context c, List<Date> data, boolean n, DateListener l) {
         context = c;
         dates = data;
         inflater = LayoutInflater.from(context);
         newContact = n;
+        listener = l;
     }
 
     public boolean isNewContact() {
