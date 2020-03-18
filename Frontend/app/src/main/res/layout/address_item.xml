@@ -6,12 +6,12 @@
     android:layout_height="wrap_content">
 
     <View
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#55000000"></View>
+        android:background="#22000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></View>
 
     <TextView
         android:id="@+id/address_item_tv_address"

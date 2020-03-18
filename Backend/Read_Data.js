@@ -10,7 +10,7 @@ function someFunc (newLine, sqlConn) {
     console.log(insertedContactId);
     sqlConn.query(q, [insertedContactId, conData[1], conData[2], conData[3]], (err, res) => {
         if (err) throw err;
-        if (conData[6] != "" || conData[7] != "" || conData[8] != "" || conData[9] != "") {
+        if (conData[6] != "" && conData[7] != "" && conData[8] != "" && conData[9] != "") {
             if (conData[9] != "") {
                 var zipcode = parseInt(conData[9], 10);
                 q = "insert into dbd_class.address (contact_id, address_type, address, city, state, zipcode) values (?,?,?,?,?,?);";
@@ -26,7 +26,7 @@ function someFunc (newLine, sqlConn) {
             }
         }
         
-        if (conData[11] != "" || conData[12] != "" || conData[13] != "" || conData[14] != "") {
+        if (conData[11] != "" && conData[12] != "" && conData[13] != "" && conData[14] != "") {
             if (conData[14] != "") {
                 q = "insert into dbd_class.address (contact_id, address_type, address, city, state, zipcode) values (?,?,?,?,?,?);";
                 sqlConn.query(q, [insertedContactId, "work", conData[11], conData[12], conData[13], parseInt(conData[14],10)], (err, res) => {

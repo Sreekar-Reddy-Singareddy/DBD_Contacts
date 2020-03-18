@@ -187,11 +187,12 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (ID < 0) return false;
         new MenuInflater(this).inflate(R.menu.contact_details_menu, menu);
         edit = menu.findItem(R.id.edit_menu_item);
         delete = menu.findItem(R.id.delete_menu_item);
         toggleViews();
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -340,6 +341,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String msg = allAddressFieldsValid(address, state, city, zipcode, type);
+                if (msg != null) {
+                    Toast.makeText(ContactDetailsActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (ID > 0) finalAddressObject.setContactId(ID);
                 finalAddressObject.setAddress(address.getText().toString());
                 finalAddressObject.setCity(city.getText().toString());
@@ -359,6 +365,16 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         });
 
         dialog.show();
+    }
+
+    private String allAddressFieldsValid(EditText address, EditText state, EditText city, EditText zipcode, EditText type) {
+        if (zipcode.getText().toString().isEmpty() || address.getText().toString().isEmpty() || state.getText().toString().isEmpty() || city.getText().toString().isEmpty()){
+            return "Address, State and City must be entered.";
+        }
+        if (zipcode.getText().toString().length() != 5) {
+            return "Zipcode must be only 5 digits.";
+        }
+        return null;
     }
 
     private void phoneEditor (String kind, Phone phoneObject) {
@@ -391,6 +407,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String msg = allPhoneFieldsValid(areacode, phone);
+                if (msg != null) {
+                    Toast.makeText(ContactDetailsActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (ID > 0) finalPhoneObject.setContactId(ID);
                 finalPhoneObject.setAreaCode(Integer.parseInt(areacode.getText().toString()));
                 finalPhoneObject.setNumber(Integer.parseInt(phone.getText().toString()));
@@ -408,6 +429,19 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         });
 
         dialog.show();
+    }
+
+    private String allPhoneFieldsValid(EditText areacode, EditText phone) {
+        if (areacode.getText().toString().isEmpty() || phone.getText().toString().isEmpty()) {
+            return "Areacode and Number are mandatory.";
+        }
+        if (areacode.getText().toString().length() != 3) {
+            return "Areacode must be exactly 3 digits.";
+        }
+        if (phone.getText().toString().length() != 7) {
+            return "Phone number must be exactly 7 digits.";
+        }
+        return null;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -441,6 +475,11 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String msg = allDateFieldsValid(type, date);
+                if (msg != null) {
+                    Toast.makeText(ContactDetailsActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (ID > 0) finalDateObject.setContactId(ID);
                 finalDateObject.setDateType(type.getText().toString());
                 String[] dateComps = date.getText().toString().split("-");
@@ -459,6 +498,23 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
 
         dialog.show();
 
+    }
+
+    private String allDateFieldsValid(EditText type, EditText date) {
+        if (type.getText().toString().isEmpty() || date.getText().toString().isEmpty()) {
+            return "All fields are mandatory.";
+        }
+        String[]  comps = date.getText().toString().split("-");
+        if (comps.length != 3 ) {
+            return "Enter date in correct format Ex: MM-DD-YYYY";
+        }
+        if (Integer.parseInt(comps[0]) < 1 || Integer.parseInt(comps[0]) > 12) {
+            return "Invalid month.";
+        }
+        if (Integer.parseInt(comps[1]) < 1 || Integer.parseInt(comps[1]) > 31) {
+            return "Invalid day.";
+        }
+        return null;
     }
 
     private void dummyData() {
