@@ -114,5 +114,18 @@ var addContact = function (sqlConn, contactJsonObject, res) {
     })
 }
 
-var exporter = {addCon: addContact, secDetails: insertSecondaryDetails, ID: insertedContactId, response: responseObj, fullContact: contactJsonMain};
+function setResponse (response) {
+    responseObj = response;
+}
+
+function setId (id) {
+    ID = id;
+}
+
+function setFullContact (data) {
+    contactJsonMain = data;
+}
+
+var exporter = {addCon: addContact, secDetails: insertSecondaryDetails,
+    setResponse: setResponse, setId: setId, setFullContact: setFullContact};
 module.exports = exporter;
