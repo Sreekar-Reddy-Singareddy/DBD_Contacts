@@ -84,7 +84,8 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         else address_vh.delete.setVisibility(View.VISIBLE);
         address_vh.address.setText(address.getAddress());
         address_vh.city.setText(address.getCity());
-        address_vh.state.setText(address.getState()+" - "+address.getZipcode());
+        if(address.getZipcode() == 0) address_vh.state.setText(address.getState());
+        else address_vh.state.setText(address.getState()+" - "+address.getZipcode());
         address_vh.type.setText(address.getAddressType());
     }
 }

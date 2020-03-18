@@ -293,6 +293,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (ID > 0) phoneObject.setContactId(ID);
                 phoneObject.setAreaCode(Integer.parseInt(areacode.getText().toString()));
                 phoneObject.setNumber(Integer.parseInt(phone.getText().toString()));
                 phoneObject.setPhoneType((String) dialogView.findViewById(type.getCheckedRadioButtonId()).getTag());
@@ -345,6 +346,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (ID > 0) dateObject.setContactId(ID);
                 dateObject.setDateType(type.getText().toString());
                 datesData.add(dateObject);
                 datesAdapter.notifyDataSetChanged();
@@ -384,6 +386,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (ID > 0) addressObject.setContactId(ID);
                 addressObject.setAddress(address.getText().toString());
                 addressObject.setCity(city.getText().toString());
                 addressObject.setState(state.getText().toString());
