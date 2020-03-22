@@ -68,19 +68,35 @@ function getContactWithID (sqlConn, id, res) {
 function getAllContacts (sqlConn, queryParams, res) {
     responseObj = res;
     console.log(queryParams);
+    var queryValues = [];
     var sqlQuery = "select * from dbd_class.contact c " +
     "join " +
     "(select distinct contact_id from dbd_class.address " +
-    "where address like ? or city like ? or state like ? or zipcode like ? " +
+    "where concat(address, city, state, zipcode) like ? " +
     "union " +
     "select distinct contact_id from dbd_class.phone " +
-    "where area_code like ? or `number` like ? " +
+    "where concat(area_code, number) like ? " +
     "union " +
     "select contact_id from dbd_class.contact " +
-    "where fname like ? or mname like ? or lname like ?) cl " +
+    "where concat(fname, mname, lname) like ?) cl " +
     "on cl.contact_id = c.contact_id;";
-    var criteria = "%"+queryParams.search_criteria+"%";
-    sqlConn.query(sqlQuery, [criteria, criteria, criteria,criteria, criteria, criteria,criteria, criteria, criteria], 
+    // var queryComps = queryParams.search_criteria.split(" ");
+    // console.log(queryComps);
+    // var criteria = "";
+    // for (var item in queryComps) {
+    //     criteria += queryComps[item]+"|";
+    // }
+    // criteria = criteria.slice(0, criteria.length-1);
+    // criteria += "";
+    criteria = "%"+queryParams.search_criteria+"%";
+    queryValues = [criteria, criteria, criteria];
+
+    if (criteria == '') {
+        sqlQuery = "select * from dbd_class.contact c;";
+        queryValues = [];
+    }
+    console.log(criteria);
+    sqlConn.query(sqlQuery, queryValues, 
         (err, result) => {
         if (err) throw err;
         var allContacts = []

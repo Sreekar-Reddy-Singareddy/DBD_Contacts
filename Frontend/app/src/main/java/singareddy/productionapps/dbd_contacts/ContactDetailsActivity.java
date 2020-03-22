@@ -122,7 +122,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             addDate.setVisibility(GONE);
             edit.setVisible(true); edit.setEnabled(true);
             fname.setEnabled(false);
-            mname.setEnabled(false);
+            mname.setEnabled(false); mname.setHint("");
             lname.setEnabled(false);
         }
         else {
@@ -132,7 +132,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             addDate.setVisibility(View.VISIBLE);
             edit.setVisible(false); edit.setEnabled(false);
             fname.setEnabled(true);
-            mname.setEnabled(true);
+            mname.setEnabled(true); mname.setHint("Middle Name");
             lname.setEnabled(true);
         }
         addressesAdapter.setNewContact(NEW_CONTACT);
