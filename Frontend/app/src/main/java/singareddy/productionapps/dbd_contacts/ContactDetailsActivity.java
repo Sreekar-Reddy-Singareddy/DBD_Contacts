@@ -230,8 +230,9 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
     }
 
     private void saveContact(View view) {
-        if (emptyFieldsInName()) {
-            Toast.makeText(this, "First and Last names are mandatory.", Toast.LENGTH_LONG).show();
+        String msg = emptyFieldsInName();
+        if (msg != null) {
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -268,8 +269,12 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         });
     }
 
-    private boolean emptyFieldsInName() {
-        return fname.getText().toString().isEmpty() || lname.getText().toString().isEmpty();
+    private String emptyFieldsInName() {
+        if (fname.getText().toString().isEmpty() || lname.getText().toString().isEmpty()) return "First and Last name are mandatory";
+        if (!fname.getText().toString().matches("[a-zA-Z \\.,]*")) return "Invalid First Name";
+        if (!mname.getText().toString().matches("[a-zA-Z \\.,]*")) return "Invalid Middle Name";
+        if (!lname.getText().toString().matches("[a-zA-Z \\.,]*")) return "Invalid Last Name";
+        return null;
     }
 
     private void updateContact() {
@@ -374,6 +379,9 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         if (zipcode.getText().toString().length() != 5) {
             return "Zipcode must be only 5 digits.";
         }
+        if (!city.getText().toString().matches("[a-zA-Z ]*")) return "Invalid City";
+        if (!state.getText().toString().matches("[a-zA-Z ]*")) return "Invalid State";
+        if (!type.getText().toString().matches("[a-zA-Z0-9 ]*")) return "Invalid Address Type";
         return null;
     }
 
@@ -407,7 +415,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String msg = allPhoneFieldsValid(areacode, phone);
+                String msg = allPhoneFieldsValid(areacode, phone, type);
                 if (msg != null) {
                     Toast.makeText(ContactDetailsActivity.this, msg, Toast.LENGTH_SHORT).show();
                     return;
@@ -431,7 +439,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         dialog.show();
     }
 
-    private String allPhoneFieldsValid(EditText areacode, EditText phone) {
+    private String allPhoneFieldsValid(EditText areacode, EditText phone, EditText type) {
         if (areacode.getText().toString().isEmpty() || phone.getText().toString().isEmpty()) {
             return "Areacode and Number are mandatory.";
         }
@@ -441,6 +449,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         if (phone.getText().toString().length() != 7) {
             return "Phone number must be exactly 7 digits.";
         }
+        if (!type.getText().toString().matches("[a-zA-Z0-9 ]*")) return "Invalid Phone Type";
         return null;
     }
 
@@ -505,6 +514,7 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
             return "All fields are mandatory.";
         }
         String[]  comps = date.getText().toString().split("-");
+        if (!comps[0].matches("[0-9]*") || !comps[1].matches("[0-9]*") || !comps[2].matches("[0-9]*")) return "Invalid Date";
         if (comps.length != 3 ) {
             return "Enter date in correct format Ex: MM-DD-YYYY";
         }
@@ -514,6 +524,13 @@ public class ContactDetailsActivity extends AppCompatActivity implements Address
         if (Integer.parseInt(comps[1]) < 1 || Integer.parseInt(comps[1]) > 31) {
             return "Invalid day.";
         }
+        if (Integer.parseInt(comps[2]) < 1500 || Integer.parseInt(comps[2]) > 2050) {
+            return "Invalid Year.";
+        }
+        if (Integer.parseInt(comps[0]) == 2 && Integer.parseInt(comps[1]) > 29) {
+            return "Invalid Date for Febraury.";
+        }
+        if (!type.getText().toString().matches("[a-zA-Z0-9 ]*")) return "Invalid Date Type";
         return null;
     }
 
